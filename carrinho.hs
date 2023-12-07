@@ -28,7 +28,8 @@ buscarNoEstoque nome ((c, nomeProduto, preco):resto)
 
 main :: IO ()
 main = do
-    let produto = buscarNoEstoque "teclado" estoque
+    let item = "teclado"
+    let produto = buscarNoEstoque item estoque
     case produto of
       Nothing -> putStrLn "Produto não encontrado no estoque."
       Just p -> do
