@@ -1,24 +1,38 @@
 type Nome = String
-type Preco = Double
-type Produto = (Nome, Preco)
+type Produto = (Int, Nome, Double)
 type Carrinho = [Produto]
 type Estoque = [Produto]
+
+estoque :: Estoque
+estoque = [(1,"teclado",50.00),(2,"monitor",450.00),(3,"tv 54", 4600.00)]
+
+encontrarProduto :: Int -> Estoque -> Maybe Produto
+encontrarProduto _ [] = Nothing
+encontrarProduto codigo ((c, nome, preco):resto)
+  | codigo == c = Just (c, nome, preco)
+  | otherwise = encontrarProduto codigo resto
 
 adicionarAoCarrinho :: Produto -> Carrinho -> Carrinho
 adicionarAoCarrinho produto carrinho = produto : carrinho
 
-removerDoCarrinho :: Nome -> Carrinho -> Carrinho
-removerDoCarrinho nome carrinho = filter (\(n, _) -> n /= nome) carrinho
+valorTotal :: Carrinho -> Double
+valorTotal [] = 0.0
+valorTotal ((codigo, nome, preco):restoCarrinho) =
+  preco + valorTotal restoCarrinho
 
-calcularTotal :: Carrinho -> Preco
-calcularTotal carrinho = sum (map snd carrinho)
+buscarNoEstoque :: Nome -> Estoque -> Maybe Produto
+buscarNoEstoque _ [] = Nothing
+buscarNoEstoque nome ((c, nomeProduto, preco):resto)
+  | nome == nomeProduto = Just (c, nomeProduto, preco)
+  | otherwise = buscarNoEstoque nome resto
 
 main :: IO ()
 main = do
-    let estoque = [("Maçã", 1.0), ("Banana", 0.5), ("Laranja", 0.75)]
-    let carrinho = adicionarAoCarrinho (estoque !! 0) []
-    let carrinho' = adicionarAoCarrinho (estoque !! 1) carrinho
-    let carrinho = adicionarAoCarrinho (estoque !! 0) []
-    let carrinho' = adicionarAoCarrinho (estoque !! 1) carrinho
-    let carrinho'' = adicionarAoCarrinho (estoque !! 2) carrinho'
-    putStrLn ("Total do carrinho: " ++ show total)
+    let produto = buscarNoEstoque "teclado" estoque
+    case produto of
+      Nothing -> putStrLn "Produto não encontrado no estoque."
+      Just p -> do
+        let carrinho = adicionarAoCarrinho p []
+        let total = valorTotal carrinho
+        putStrLn ("Total do carrinho: " ++ show total)
+
